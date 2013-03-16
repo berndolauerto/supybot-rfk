@@ -62,7 +62,6 @@ class RfK(callbacks.Plugin):
                     self.last_dj_id = current_dj['dj_id'] if current_dj else None
                     self.last_dj_name = current_dj['dj_name' if current_dj else None
 
-
                 # check for track changes
                 result = self._query('current_track')
                 if result:

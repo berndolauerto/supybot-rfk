@@ -33,5 +33,7 @@ conf.registerGlobalValue(RfK, 'pollingInterval',
     registry.PositiveInteger(15, """Interval at which to poll the radio server"""))
 conf.registerChannelValue(RfK, 'announce',
     registry.Boolean(False, """Announce radio status on this channel"""))
+conf.registerChannelValue(RfK, 'announcePrefix',
+    registry.String('[RfK]', """Prefix for every announment made"""))
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
