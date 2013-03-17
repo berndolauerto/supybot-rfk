@@ -11,7 +11,7 @@ import supybot.plugins as plugins
 import supybot.ircutils as ircutils
 import supybot.callbacks as callbacks
 import supybot.schedule as schedule
-import supybot.ircmsg as ircmsgs
+import supybot.ircmsgs as ircmsgs
 
 import supybot.log as log
 
@@ -56,11 +56,11 @@ class RfK(callbacks.Plugin):
 
                     # dj changed since last check
                     elif current_dj and self.last_dj_id and current_dj['dj_id'] != self.last_dj_id:
-                        announce u'Instead of %s, %s is streaming now' % (self.last_dj_name, current_dj['dj_name'])
+                        announce = u'Instead of %s, %s is streaming now' % (self.last_dj_name, current_dj['dj_name'])
                         self._announce(irc, announce)
 
                     self.last_dj_id = current_dj['dj_id'] if current_dj else None
-                    self.last_dj_name = current_dj['dj_name' if current_dj else None
+                    self.last_dj_name = current_dj['dj_name'] if current_dj else None
 
                 # check for track changes
                 result = self._query('current_track')
@@ -102,7 +102,7 @@ class RfK(callbacks.Plugin):
 
         try:
             response = opener.open(request_url)
-        except: URLError, e:
+        except IOError, e:
             log.error('RfK._query: %s' % repr(e))
         else:
             try:
