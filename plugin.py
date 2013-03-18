@@ -40,39 +40,35 @@ class RfK(callbacks.Plugin):
 
                 # check for dj changes
                 result = self._query('current_dj')
-                if result:
+                current_dj = result['data']['current_dj']
 
-                    current_dj = result['data']['current_dj']
+                # dj stopped streaming
+                if not current_dj and self.last_dj_id:
+                    announce = u'%s stopped streaming' % self.last_dj_name
+                    self._announce(irc, announce)
 
-                    # dj stopped streaming
-                    if not current_dj and self.last_dj_id:
-                        announce = u'%s stopped streaming' % self.last_dj_name
-                        self._announce(irc, announce)
+                # dj started streaming
+                elif current_dj and not self.last_dj_id:
+                    announce = u'%s started streaming' % current_dj['dj_name']
+                    self._announce(irc, announce)
 
-                    # dj started streaming
-                    elif current_dj and not self.last_dj_id:
-                        announce = u'%s started streaming' % current_dj['dj_name']
-                        self._announce(irc, announce)
+                # dj changed since last check
+                elif current_dj and self.last_dj_id and current_dj['dj_id'] != self.last_dj_id:
+                    announce = u'Instead of %s, %s is streaming now' % (self.last_dj_name, current_dj['dj_name'])
+                    self._announce(irc, announce)
 
-                    # dj changed since last check
-                    elif current_dj and self.last_dj_id and current_dj['dj_id'] != self.last_dj_id:
-                        announce = u'Instead of %s, %s is streaming now' % (self.last_dj_name, current_dj['dj_name'])
-                        self._announce(irc, announce)
-
-                    self.last_dj_id = current_dj['dj_id'] if current_dj else None
-                    self.last_dj_name = current_dj['dj_name'] if current_dj else None
+                self.last_dj_id = current_dj['dj_id'] if current_dj else None
+                self.last_dj_name = current_dj['dj_name'] if current_dj else None
 
                 # check for track changes
                 result = self._query('current_track')
-                if result:
+                current_track = result['data']['current_track']
 
-                    current_track = result['data']['current_track']
+                if current_track and self.last_track_id != current_track['track_id']:
+                    announce = u'%s - %s' % (current_track['track_artist'], current_track['track_title'])
+                    self._announce(irc, announce)
 
-                    if current_track and self.last_track_id != current_track['track_id']:
-                        announce = u'%s - %s' % (current_track['track_artist'], current_track['track_title'])
-                        self._announce(irc, announce)
-
-                    self.last_track_id = current_track['track_id'] if current_track else None
+                self.last_track_id = current_track['track_id'] if current_track else None
 
             except Exception, e:
                 log.error('RfK.poll_event: %s' % repr(e))
@@ -129,19 +125,18 @@ class RfK(callbacks.Plugin):
         Return the currently streaming dj
         """
 
-        result = self._query('current_dj')
-        if result:
-
-            current_dj = result['data']['current_dj']
+        try:
+            current_dj = self._query('current_dj')['data']['current_dj']
             if current_dj:
                 reply = u'%s is streaming right now' % current_dj['dj_name']
             else:
                 reply = u'No one is streaming right now'
 
-        else:
+        except:
             reply = self.reply_error
 
-        irc.reply(reply)
+        finally:
+            irc.reply(reply)
 
 
 Class = RfK
