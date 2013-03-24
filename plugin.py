@@ -19,6 +19,8 @@ import json
 import urllib
 import urllib2
 
+import operator
+
 
 class RfK(callbacks.Plugin):
     """RfK MK IV supybot plugin"""
@@ -131,6 +133,40 @@ class RfK(callbacks.Plugin):
                 reply = u'%s is streaming right now' % current_dj['dj_name']
             else:
                 reply = u'No one is streaming right now'
+
+        except:
+            reply = self.reply_error
+
+        finally:
+            irc.reply(reply)
+
+    def listener(self, irc, msg, args):
+        """
+        Return the corrent listener count and additional stats
+        """
+
+        try:
+            listener = self._query('listener')['data']['listener']
+            if listener:
+
+                if listener['total_count'] > 0:
+
+                    reply_stream = []
+                    streams = sorted(listener['per_stream'].iteritems(), key=operator.itemgetter(1), reverse=True)
+                    for stream in streams:
+                        reply_stream.append('%d via %s' % (stream[1]['count'], stream[1]['name']))
+                    reply_stream = '%s' % (' | '.join(reply_stream))
+
+                    reply_country = []
+                    countries = sorted(listener['per_country'].iteritems(), key=operator.itemgetter(1), reverse=True)
+                    for country in countries:
+                        reply_country.append('%s: %d' % (country[0], country[1]['count']))
+                    reply_country = '%s' % (' | '.join(reply_country))
+
+                    reply = 'Listener: %d ( %s )( %s )' % (listener['total_count'], reply_stream, reply_country)
+
+                else:
+                    reply = 'No one is listening right now'
 
         except:
             reply = self.reply_error
