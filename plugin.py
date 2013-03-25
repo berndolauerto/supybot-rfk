@@ -129,6 +129,7 @@ class RfK(callbacks.Plugin):
 
         try:
             current_dj = self._query('current_dj')['data']['current_dj']
+
             if current_dj:
                 reply = u'%s is streaming right now' % current_dj['dj_name']
             else:
@@ -140,10 +141,12 @@ class RfK(callbacks.Plugin):
         finally:
             irc.reply(reply)
 
+    dj = wrap(dj)
+
 
     def kickdj(self, irc, msg, args):
         """
-        Kicks the currently streaming dj
+        Kick the currently streaming dj
         """
 
         try:
@@ -160,14 +163,66 @@ class RfK(callbacks.Plugin):
         finally:
             irc.reply(reply)
 
+    kickdj = wrap(kickdj, ['admin'])
+
+
+    def track(self, irc, msg, args):
+        """
+        Return the currently playing track
+        """
+
+        try:
+            current_track = self._query('current_track')['data']['current_track']
+
+            if current_track:
+                reply = u'%s - %s' % (current_track['track_artist'], current_track['track_title'])
+            else:
+                reply = u'Nothing is on right now'
+
+        except:
+            reply = self.reply_error
+
+        finally:
+            irc.reply(reply)
+
+    track = wrap(track)
+
+
+    def tracklist(self, irc, msg, args, num=3):
+        """
+        Return the last x played tracks (default: x = 3)
+        """
+
+        try:
+            last_tracks = self._query('last_tracks')['data']['last_tracks']
+
+            if last_tracks:
+
+                reply_tracks = []
+                for track in last_tracks['tracks']:
+                    reply_tracks.append('[%s - %s]' % (track['track_artist'], track['track_title']))
+                reply = u', '.join(reply_tracks)
+
+            else:
+                reply = u'Track history is empty'
+
+        except:
+            reply = self.reply_error
+
+        finally:
+            irc.reply(reply)
+
+    tracklist = wrap(tracklist, [optional('int')])
+
 
     def listener(self, irc, msg, args):
         """
-        Return the corrent listener count and additional stats
+        Return the current listener count and additional stats
         """
 
         try:
             listener = self._query('listener')['data']['listener']
+
             if listener:
 
                 if listener['total_count'] > 0:
@@ -176,7 +231,7 @@ class RfK(callbacks.Plugin):
                     streams = sorted(listener['per_stream'].iteritems(), key=operator.itemgetter(1), reverse=True)
                     for stream in streams:
                         reply_stream.append('%d via %s' % (stream[1]['count'], stream[1]['name']))
-                    reply_stream = '%s' % (' | '.join(reply_stream))
+                    reply_stream = ' | '.join(reply_stream)
 
                     foreigner_count = 0
                     reply_country = []
@@ -185,7 +240,7 @@ class RfK(callbacks.Plugin):
                         reply_country.append('%s: %d' % (country[0], country[1]['count']))
                         if country[0] not in ('DE', 'BAY'):
                             foreigner_count += country[1]['count']
-                    reply_country = '%s' % (' | '.join(reply_country))
+                    reply_country = ' | '.join(reply_country)
                     foreigner_count = int((float(foreigner_count) / float(total_count)) * 100)
 
                     reply = u'Listener: %d ( %s )( %s )( %d%% foreigners' % (listener['total_count'], reply_stream, reply_country, foreigner_count)
@@ -199,7 +254,7 @@ class RfK(callbacks.Plugin):
         finally:
             irc.reply(reply)
 
-
+    listener = wrap(listener)
 
 
 Class = RfK
