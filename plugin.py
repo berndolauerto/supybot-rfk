@@ -140,6 +140,27 @@ class RfK(callbacks.Plugin):
         finally:
             irc.reply(reply)
 
+
+    def kickdj(self, irc, msg, args):
+        """
+        Kicks the currently streaming dj
+        """
+
+        try:
+            kick_dj = self._query('kick_dj')['data']['kick_dj']
+
+            if kick_dj:
+                reply = u'%s was kicked successfully' % kick_dj['dj_name']
+            else:
+                reply = u'Cleansing could not be completed'
+
+        except:
+            reply = self.reply_error
+
+        finally:
+            irc.reply(reply)
+
+
     def listener(self, irc, msg, args):
         """
         Return the corrent listener count and additional stats
@@ -167,16 +188,18 @@ class RfK(callbacks.Plugin):
                     reply_country = '%s' % (' | '.join(reply_country))
                     foreigner_count = int((float(foreigner_count) / float(total_count)) * 100)
 
-                    reply = 'Listener: %d ( %s )( %s )( %d%% foreigners' % (listener['total_count'], reply_stream, reply_country, foreigner_count)
+                    reply = u'Listener: %d ( %s )( %s )( %d%% foreigners' % (listener['total_count'], reply_stream, reply_country, foreigner_count)
 
                 else:
-                    reply = 'No one is listening right now'
+                    reply = u'No one is listening right now'
 
         except:
             reply = self.reply_error
 
         finally:
             irc.reply(reply)
+
+
 
 
 Class = RfK
