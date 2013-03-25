@@ -157,13 +157,17 @@ class RfK(callbacks.Plugin):
                         reply_stream.append('%d via %s' % (stream[1]['count'], stream[1]['name']))
                     reply_stream = '%s' % (' | '.join(reply_stream))
 
+                    foreigner_count = 0
                     reply_country = []
                     countries = sorted(listener['per_country'].iteritems(), key=operator.itemgetter(1), reverse=True)
                     for country in countries:
                         reply_country.append('%s: %d' % (country[0], country[1]['count']))
+                        if country[0] not in ('DE', 'BAY'):
+                            foreigner_count += country[1]['count']
                     reply_country = '%s' % (' | '.join(reply_country))
+                    foreigner_count = int((float(foreigner_count) / float(total_count)) * 100)
 
-                    reply = 'Listener: %d ( %s )( %s )' % (listener['total_count'], reply_stream, reply_country)
+                    reply = 'Listener: %d ( %s )( %s )( %d%% foreigners' % (listener['total_count'], reply_stream, reply_country, foreigner_count)
 
                 else:
                     reply = 'No one is listening right now'
