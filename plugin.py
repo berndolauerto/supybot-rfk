@@ -20,6 +20,11 @@ import urllib
 import urllib2
 
 import operator
+import humanize
+
+import pytz
+import datetime
+import dateutil.parser
 
 
 class RfK(callbacks.Plugin):
@@ -120,6 +125,17 @@ class RfK(callbacks.Plugin):
         for channel in irc.state.channels:
             if self.registryValue('announce', channel):
                 irc.queueMsg(ircmsgs.privmsg(channel, message))
+
+
+    def _get_djs(self, show):
+        djs = []
+        for dj in show['dj']:
+            djs.append(dj['dj_name'])
+        return djs
+
+
+    def _format_time(self, time_string):
+        return humanize.time.naturaldelta(pytz.utc.localize(datetime.datetime.utcnow()) - dateutil.parser.parse(time_string))
 
 
     def dj(self, irc, msg, args):
@@ -243,7 +259,7 @@ class RfK(callbacks.Plugin):
                     reply_country = ' | '.join(reply_country)
                     foreigner_count = int((float(foreigner_count) / float(total_count)) * 100)
 
-                    reply = u'Listener: %d ( %s )( %s )( %d%% foreigners' % (listener['total_count'], reply_stream, reply_country, foreigner_count)
+                    reply = u'Listener: %d ( %s )( %s )( %d%% foreigners )' % (listener['total_count'], reply_stream, reply_country, foreigner_count)
 
                 else:
                     reply = u'No one is listening right now'
@@ -255,6 +271,52 @@ class RfK(callbacks.Plugin):
             irc.reply(reply)
 
     listener = wrap(listener)
+
+
+    def show(self, irc, msg, args):
+        """
+        Return information about the current show
+        """
+
+        try:
+            current_show = self._query('current_show')['data']['current_show']
+
+            if current_show:
+
+                # overlap dedection
+                if 'planned_show' in current_show:
+                    # we got ourselves a overlap
+                    # planned_show <- what should be running
+                    # running_show <- what is running at the moment
+                    planned_show = current_show['planned_show']
+                    running_show = current_show['running_show']
+
+                    reply = u'%s with %s is supposed to run but %s with %s is on instead' % (
+                        planned_show['show_name'], ' and '.join(self._get_djs(planned_show)),
+                        running_show['show_name'], ' and '.join(self._get_djs(running_show)))
+
+                else:
+                    running_show = current_show['running_show']
+
+                    # check if one the djs is really connected
+                    if running_show['show_connected'] == True:
+                        reply = u'%s (%s) with %s is on right now, %s to go' % (
+                            running_show['show_name'], running_show['show_description'], ' and '.join(self._get_djs(running_show)), self._format_time(running_show['show_end']))
+
+                    else:
+                        reply = u'%s with %s is supposed to run for %s but no one is streaming right now' % (
+                            running_show['show_name'], ' and '.join(self._get_djs(running_show)), self._format_time(running_show['show_begin']))
+
+            else:
+                reply = u'No one is streaming right now'
+
+        except Exception, e:
+            reply = self.reply_error
+
+        finally:
+            irc.reply(reply)
+
+    show = wrap(show)
 
 
 Class = RfK
