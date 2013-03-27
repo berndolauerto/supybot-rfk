@@ -127,11 +127,20 @@ class RfK(callbacks.Plugin):
                 irc.queueMsg(ircmsgs.privmsg(channel, message))
 
 
+    def _natural_join(lst):
+        l = len(lst);
+        if l <= 2:
+            return ' and '.join(lst)
+        elif l > 2:
+            first =  ', '.join(lst[0:-1])
+            return "%s %s %s" % (first, 'and', lst[-1])
+
+
     def _format_djs(self, show):
         djs = []
         for dj in show['dj']:
             djs.append(dj['dj_name'])
-        return ' and '.join(djs)
+        return self._natural_join(djs)
 
 
     def _format_timedelta(self, time_string):
