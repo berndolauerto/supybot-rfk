@@ -136,6 +136,10 @@ class RfK(callbacks.Plugin):
             return "%s %s %s" % (first, 'and', lst[-1])
 
 
+    def _shorten_string(self, string):
+        return utils.str.ellipsisify(string, self.registryValue('maxStringLength'))
+
+
     def _format_djs(self, show):
         djs = []
         for dj in show['dj']:
@@ -315,7 +319,7 @@ class RfK(callbacks.Plugin):
                     # check if one the djs is really connected
                     if running_show['show_connected'] == True:
                         reply = u'%s (%s) with %s is on right now, %s to go' % (
-                            running_show['show_name'], running_show['show_description'],
+                            running_show['show_name'], self._shorten_string(running_show['show_description']),
                             self._format_djs(running_show), self._format_timedelta(running_show['show_end']))
 
                     else:
@@ -347,7 +351,7 @@ class RfK(callbacks.Plugin):
                 next_show = next_shows['shows'][0]
 
                 reply = u'Next planned show is %s with %s (%s) [%s] - in %s' % (
-                    next_show['show_name'], self._format_djs(next_show), next_show['show_description'],
+                    next_show['show_name'], self._format_djs(next_show), self._shorten_string(next_show['show_description']),
                     self._format_showtime(next_show), self._format_timedelta(next_show['show_begin']))
 
             else:
@@ -374,7 +378,7 @@ class RfK(callbacks.Plugin):
                 last_show = last_shows['shows'][0]
 
                 reply = u'Last show was %s with %s (%s) [%s] - %s ago' % (
-                    last_show['show_name'], self._format_djs(last_show), last_show['show_description'],
+                    last_show['show_name'], self._format_djs(last_show), self._shorten_string(last_show['show_description']),
                     self._format_showtime(last_show), self._format_timedelta(last_show['show_end']))
 
             else:

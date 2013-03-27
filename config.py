@@ -35,5 +35,7 @@ conf.registerChannelValue(RfK, 'announce',
     registry.Boolean(False, """Announce radio status on this channel"""))
 conf.registerChannelValue(RfK, 'announcePrefix',
     registry.String('[RfK]', """Prefix for every announment made"""))
+conf.registerGlobalValue(RfK, 'maxStringLength',
+    registry.PositiveInteger(140, """Allowed string length before shortener kicks in"""))
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:
