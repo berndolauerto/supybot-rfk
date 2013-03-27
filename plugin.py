@@ -32,6 +32,7 @@ class RfK(callbacks.Plugin):
 
     threaded = True
 
+
     def __init__(self, irc):
         self.__parent = super(RfK, self)
         self.__parent.__init__(irc)
@@ -89,6 +90,13 @@ class RfK(callbacks.Plugin):
             schedule.addPeriodicEvent(poll_event,
                 self.registryValue('pollingInterval'),
                 name='RfK.pollStatus')
+
+
+    # plugin destructor
+    def die(self):
+        # remove any old events
+        if 'RfK.pollStatus' in schedule.schedule.events:
+            schedule.removePeriodicEvent('RfK.pollStatus')
 
 
     def _query(self, function, **params):
