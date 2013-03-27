@@ -127,15 +127,19 @@ class RfK(callbacks.Plugin):
                 irc.queueMsg(ircmsgs.privmsg(channel, message))
 
 
-    def _get_djs(self, show):
+    def _format_djs(self, show):
         djs = []
         for dj in show['dj']:
             djs.append(dj['dj_name'])
-        return djs
+        return ' and '.join(djs)
 
 
-    def _format_time(self, time_string):
+    def _format_timedelta(self, time_string):
         return humanize.time.naturaldelta(pytz.utc.localize(datetime.datetime.utcnow()) - dateutil.parser.parse(time_string))
+
+
+    def _format_showtime(self, show):
+        return u'%s - %s UTC' % (dateutil.parser.parse(show['show_begin']).strftime('%d.%m. %H:%M'), dateutil.parser.parse(show['show_end']).strftime('%H:%M'))
 
 
     def dj(self, irc, msg, args):
@@ -205,7 +209,7 @@ class RfK(callbacks.Plugin):
 
 
     def tracklist(self, irc, msg, args, num=3):
-        """
+        """<num>
         Return the last x played tracks (default: x = 3)
         """
 
@@ -259,7 +263,8 @@ class RfK(callbacks.Plugin):
                     reply_country = ' | '.join(reply_country)
                     foreigner_count = int((float(foreigner_count) / float(total_count)) * 100)
 
-                    reply = u'Listener: %d ( %s )( %s )( %d%% foreigners )' % (listener['total_count'], reply_stream, reply_country, foreigner_count)
+                    reply = u'Listener: %d ( %s )( %s )( %d%% foreigners )' % (
+                        listener['total_count'], reply_stream, reply_country, foreigner_count)
 
                 else:
                     reply = u'No one is listening right now'
@@ -285,15 +290,15 @@ class RfK(callbacks.Plugin):
 
                 # overlap dedection
                 if 'planned_show' in current_show:
-                    # we got ourselves a overlap
+                    # we got ourselves an overlap
                     # planned_show <- what should be running
                     # running_show <- what is running at the moment
                     planned_show = current_show['planned_show']
                     running_show = current_show['running_show']
 
                     reply = u'%s with %s is supposed to run but %s with %s is on instead' % (
-                        planned_show['show_name'], ' and '.join(self._get_djs(planned_show)),
-                        running_show['show_name'], ' and '.join(self._get_djs(running_show)))
+                        planned_show['show_name'], self._format_djs(planned_show),
+                        running_show['show_name'], self._format_djs(running_show))
 
                 else:
                     running_show = current_show['running_show']
@@ -301,22 +306,52 @@ class RfK(callbacks.Plugin):
                     # check if one the djs is really connected
                     if running_show['show_connected'] == True:
                         reply = u'%s (%s) with %s is on right now, %s to go' % (
-                            running_show['show_name'], running_show['show_description'], ' and '.join(self._get_djs(running_show)), self._format_time(running_show['show_end']))
+                            running_show['show_name'], running_show['show_description'],
+                            self._format_djs(running_show), self._format_timedelta(running_show['show_end']))
 
                     else:
                         reply = u'%s with %s is supposed to run for %s but no one is streaming right now' % (
-                            running_show['show_name'], ' and '.join(self._get_djs(running_show)), self._format_time(running_show['show_begin']))
+                            running_show['show_name'], self._format_djs(running_show),
+                            self._format_timedelta(running_show['show_begin']))
 
             else:
                 reply = u'No one is streaming right now'
 
-        except Exception, e:
+        except:
             reply = self.reply_error
 
         finally:
             irc.reply(reply)
 
     show = wrap(show)
+
+
+    def nextshow(self, irc, msg, args, dj_name):
+        """<dj_name>
+        Return the next planned show with <dj_name>
+        """
+
+        try:
+            next_shows = self._query('next_shows', dj_name=dj_name, limit=1)['data']['next_shows']
+
+            if next_shows:
+                next_show = next_shows['shows'][0]
+
+                reply = u'Next planned show is %s with %s (%s) [%s] - in %s' % (
+                    next_show['show_name'], self._format_djs(next_show), next_show['show_description'],
+                    self._format_showtime(next_show), self._format_timedelta(next_show['show_begin']))
+
+            else:
+                reply = u'No scheduled shows' if not dj_name else u'No scheduled shows with %s' % dj_name
+
+
+        except:
+            reply = self.reply_error
+
+        finally:
+            irc.reply(reply)
+
+    nextshow = wrap(nextshow, [optional('somethingWithoutSpaces')])
 
 
 Class = RfK
