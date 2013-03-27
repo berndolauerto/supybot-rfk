@@ -344,7 +344,6 @@ class RfK(callbacks.Plugin):
             else:
                 reply = u'No scheduled shows' if not dj_name else u'No scheduled shows with %s' % dj_name
 
-
         except:
             reply = self.reply_error
 
@@ -352,6 +351,33 @@ class RfK(callbacks.Plugin):
             irc.reply(reply)
 
     nextshow = wrap(nextshow, [optional('somethingWithoutSpaces')])
+
+
+    def lastshow(self, irc, msg, args, dj_name):
+        """<dj_name>
+        Return the last show with <dj_name>
+        """
+
+        try:
+            last_shows = self._query('last_shows', dj_name=dj_name, limit=1)['data']['last_shows']
+
+            if last_shows:
+                last_show = last_shows['shows'][0]
+
+                reply = u'Last show was %s with %s (%s) [%s] - %s ago' % (
+                    last_show['show_name'], self._format_djs(last_show), last_show['show_description'],
+                    self._format_showtime(last_show), self._format_timedelta(last_show['show_end']))
+
+            else:
+                reply = u'No show took place, yet' if not dj_name else u'%s never did a show so far' % dj_name
+
+        except:
+            reply = self.reply_error
+
+        finally:
+            irc.reply(reply)
+
+    lastshow = wrap(lastshow, [optional('somethingWithoutSpaces')])
 
 
 Class = RfK
