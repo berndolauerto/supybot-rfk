@@ -19,7 +19,6 @@ import json
 import urllib
 import urllib2
 
-import operator
 import humanize
 
 import pytz
@@ -269,14 +268,14 @@ class RfK(callbacks.Plugin):
                 if listener['total_count'] > 0:
 
                     reply_stream = []
-                    streams = sorted(listener['per_stream'].iteritems(), key=operator.itemgetter(1), reverse=True)
+                    streams = sorted(listener['per_stream'].iteritems(), key=lambda (k, v): v['count'], reverse=True)
                     for stream in streams:
                         reply_stream.append('%d via %s' % (stream[1]['count'], stream[1]['name']))
                     reply_stream = ' | '.join(reply_stream)
 
                     foreigner_count = 0
                     reply_country = []
-                    countries = sorted(listener['per_country'].iteritems(), key=operator.itemgetter(1), reverse=True)
+                    countries = sorted(listener['per_country'].iteritems(), key=lambda (k, v): v['count'], reverse=True)
                     for country in countries:
                         reply_country.append('%s: %d' % (country[0], country[1]['count']))
                         if country[0] not in ('DE', 'BAY'):
