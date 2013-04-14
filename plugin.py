@@ -56,7 +56,14 @@ class RfK(callbacks.Plugin):
 
                 # dj started streaming
                 elif current_dj and not self.last_dj_id:
-                    announce = u'%s started streaming' % current_dj['dj_name']
+                    show = self._query('current_show')['data']['current_show']
+                    if show:
+                        if show['running_show']['show_end']:
+                            announce = u'%s started streaming %s, %s to go' % (
+                                current_dj['dj_name'], show['running_show']['show_name'],
+                                self._format_timedelta(show['running_show']['show_end']))
+                        else:
+                            announce = u'%s started streaming' % current_dj['dj_name']
                     self._announce(irc, announce)
 
                 # dj changed since last check
@@ -383,7 +390,7 @@ class RfK(callbacks.Plugin):
 
     def lastshow(self, irc, msg, args, dj_name):
         """[<dj_name>]
-        
+
         Return the last show with <dj_name>
         """
 
