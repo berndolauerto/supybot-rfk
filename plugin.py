@@ -96,6 +96,7 @@ class RfK(callbacks.Plugin):
         # remove any old events
         if 'RfK.pollStatus' in schedule.schedule.events:
             schedule.removePeriodicEvent('RfK.pollStatus')
+        self.__parent.die()
 
 
     def _query(self, function, **params):
@@ -164,6 +165,7 @@ class RfK(callbacks.Plugin):
 
     def dj(self, irc, msg, args):
         """
+
         Return the currently streaming dj
         """
 
@@ -186,6 +188,7 @@ class RfK(callbacks.Plugin):
 
     def kickdj(self, irc, msg, args):
         """
+
         Kick the currently streaming dj
         """
 
@@ -208,6 +211,7 @@ class RfK(callbacks.Plugin):
 
     def track(self, irc, msg, args):
         """
+
         Return the currently playing track
         """
 
@@ -229,7 +233,8 @@ class RfK(callbacks.Plugin):
 
 
     def tracklist(self, irc, msg, args, num=3):
-        """<num>
+        """[<num>]
+
         Return the last x played tracks (default: x = 3)
         """
 
@@ -257,6 +262,7 @@ class RfK(callbacks.Plugin):
 
     def listener(self, irc, msg, args):
         """
+
         Return the current listener count and additional stats
         """
 
@@ -300,6 +306,7 @@ class RfK(callbacks.Plugin):
 
     def show(self, irc, msg, args):
         """
+
         Return information about the current show
         """
 
@@ -347,7 +354,8 @@ class RfK(callbacks.Plugin):
 
 
     def nextshow(self, irc, msg, args, dj_name):
-        """<dj_name>
+        """[<dj_name>]
+
         Return the next planned show with <dj_name>
         """
 
@@ -374,7 +382,8 @@ class RfK(callbacks.Plugin):
 
 
     def lastshow(self, irc, msg, args, dj_name):
-        """<dj_name>
+        """[<dj_name>]
+        
         Return the last show with <dj_name>
         """
 
