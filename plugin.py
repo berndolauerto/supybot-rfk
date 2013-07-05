@@ -106,6 +106,10 @@ class RfK(callbacks.Plugin):
 
 
     def _query(self, function, **params):
+
+        # filter out empty params
+        params = {key: value for key, value in params.iteritems() if value }
+
         log.debug('RfK._query: %s' % repr(params))
 
         if self.registryValue('httpProxy'):
