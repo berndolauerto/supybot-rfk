@@ -132,7 +132,7 @@ class RfK(callbacks.Plugin):
                 else:
                     log.debug('RfK._query: %s' % repr(data))
                     return data
-                    
+
 
     def _announce(self, irc, message):
         message = u'%s %s' % (self.registryValue('announcePrefix'), message)
@@ -141,7 +141,7 @@ class RfK(callbacks.Plugin):
                 irc.queueMsg(ircmsgs.privmsg(channel, message))
 
 
-    def _natural_join(lst):
+    def _natural_join(self, lst):
         l = len(lst);
         if l <= 2:
             return ' and '.join(lst)
