@@ -297,7 +297,7 @@ class RfK(callbacks.Plugin):
                         if country[0] not in ('DE', 'BAY'):
                             foreigner_count += country[1]['count']
                     reply_country = ' | '.join(reply_country)
-                    foreigner_count = int((float(foreigner_count) / float(total_count)) * 100)
+                    foreigner_count = int((float(foreigner_count) / float(listener['total_count'])) * 100)
 
                     reply = u'Listener: %d ( %s )( %s )( %d%% foreigners )' % (
                         listener['total_count'], reply_stream, reply_country, foreigner_count)
@@ -342,9 +342,17 @@ class RfK(callbacks.Plugin):
 
                     # check if one the djs is really connected
                     if running_show['show_connected'] == True:
-                        reply = u'%s (%s) with %s is on right now, %s to go' % (
-                            running_show['show_name'], self._shorten_string(running_show['show_description']),
-                            self._format_djs(running_show), self._format_timedelta(running_show['show_end']))
+
+                        # planned show
+                        if running_show['show_end']:
+                            reply = u'%s (%s) with %s is on right now, %s to go' % (
+                                running_show['show_name'], self._shorten_string(running_show['show_description']),
+                                self._format_djs(running_show), self._format_timedelta(running_show['show_end']))
+                        # unplanned show with open end
+                        else:
+                            reply = u'%s (%s) with %s is on right now, running for %s' % (
+                                running_show['show_name'], self._shorten_string(running_show['show_description']),
+                                self._format_djs(running_show), self._format_timedelta(running_show['show_begin']))
 
                     else:
                         reply = u'%s with %s is supposed to run for %s but no one is streaming right now' % (
