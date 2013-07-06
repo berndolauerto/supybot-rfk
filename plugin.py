@@ -58,7 +58,7 @@ class RfK(callbacks.Plugin):
                 elif current_dj and not self.last_dj_id:
                     show = self._query('current_show')['data']['current_show']
                     if show and show['running_show']['show_end']:
-                        announce = u'%s started streaming %s, %s to go' % (
+                        announce = u'%s started streaming "%s", %s to go' % (
                             current_dj['dj_name'], show['running_show']['show_name'],
                             self._format_timedelta(show['running_show']['show_end']))
                     else:
@@ -333,7 +333,7 @@ class RfK(callbacks.Plugin):
                     planned_show = current_show['planned_show']
                     running_show = current_show['running_show']
 
-                    reply = u'%s with %s is supposed to run but %s with %s is on instead' % (
+                    reply = u'"%s" with %s is supposed to run but "%s" with %s is on instead' % (
                         planned_show['show_name'], self._format_djs(planned_show),
                         running_show['show_name'], self._format_djs(running_show))
 
@@ -345,17 +345,18 @@ class RfK(callbacks.Plugin):
 
                         # planned show
                         if running_show['show_end']:
-                            reply = u'%s (%s) with %s is on right now, %s to go' % (
+                            reply = u'"%s" (%s) with %s is on right now, %s to go' % (
                                 running_show['show_name'], self._shorten_string(running_show['show_description']),
                                 self._format_djs(running_show), self._format_timedelta(running_show['show_end']))
+
                         # unplanned show with open end
                         else:
-                            reply = u'%s (%s) with %s is on right now, running for %s' % (
+                            reply = u'"%s" (%s) with %s is on right now, running for %s' % (
                                 running_show['show_name'], self._shorten_string(running_show['show_description']),
                                 self._format_djs(running_show), self._format_timedelta(running_show['show_begin']))
 
                     else:
-                        reply = u'%s with %s is supposed to run for %s but no one is streaming right now' % (
+                        reply = u'"%s" with %s is supposed to run for %s but no one is streaming right now' % (
                             running_show['show_name'], self._format_djs(running_show),
                             self._format_timedelta(running_show['show_begin']))
 
@@ -383,7 +384,7 @@ class RfK(callbacks.Plugin):
             if next_shows:
                 next_show = next_shows['shows'][0]
 
-                reply = u'Next planned show is %s with %s (%s) [%s] - in %s' % (
+                reply = u'Next planned show is "%s" with %s (%s) [%s] -- in %s' % (
                     next_show['show_name'], self._format_djs(next_show), self._shorten_string(next_show['show_description']),
                     self._format_showtime(next_show), self._format_timedelta(next_show['show_begin']))
 
@@ -411,7 +412,7 @@ class RfK(callbacks.Plugin):
             if last_shows:
                 last_show = last_shows['shows'][0]
 
-                reply = u'Last show was %s with %s (%s) [%s] - %s ago' % (
+                reply = u'Last show was "%s" with %s (%s) [%s] -- %s ago' % (
                     last_show['show_name'], self._format_djs(last_show), self._shorten_string(last_show['show_description']),
                     self._format_showtime(last_show), self._format_timedelta(last_show['show_end']))
 
@@ -428,6 +429,3 @@ class RfK(callbacks.Plugin):
 
 
 Class = RfK
-
-
-# vim:set shiftwidth=4 softtabstop=4 expandtab textwidth=79:
