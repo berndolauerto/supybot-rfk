@@ -31,7 +31,6 @@ class RfK(callbacks.Plugin):
 
     threaded = True
 
-
     def __init__(self, irc):
         self.__parent = super(RfK, self)
         self.__parent.__init__(irc)
@@ -92,10 +91,11 @@ class RfK(callbacks.Plugin):
 
         # register event
         if self.registryValue('enablePolling'):
-            schedule.addPeriodicEvent(poll_event,
+            schedule.addPeriodicEvent(
+                poll_event,
                 self.registryValue('pollingInterval'),
-                name='RfK.pollStatus')
-
+                name='RfK.pollStatus'
+            )
 
     # plugin destructor
     def die(self):
@@ -104,11 +104,10 @@ class RfK(callbacks.Plugin):
             schedule.removePeriodicEvent('RfK.pollStatus')
         self.__parent.die()
 
-
     def _query(self, function, **params):
 
         # filter out empty params
-        params = {key: value for key, value in params.iteritems() if value }
+        params = {key: value for key, value in params.iteritems() if value}
 
         log.debug('RfK._query: %s' % repr(params))
 
@@ -118,8 +117,12 @@ class RfK(callbacks.Plugin):
         else:
             opener = urllib2.build_opener()
 
-        request_url = '%s%s?key=%s&%s' % (self.registryValue('queryURL'), function,
-            self.registryValue('queryPass'), urllib.urlencode(params))
+        request_url = '%s%s?key=%s&%s' % (
+            self.registryValue('queryURL'),
+            function,
+            self.registryValue('queryPass'),
+            urllib.urlencode(params)
+        )
 
         try:
             response = opener.open(request_url)
@@ -137,26 +140,22 @@ class RfK(callbacks.Plugin):
                     log.debug('RfK._query: %s' % repr(data))
                     return data
 
-
     def _announce(self, irc, message):
         message = u'%s %s' % (self.registryValue('announcePrefix'), message)
         for channel in irc.state.channels:
             if self.registryValue('announce', channel):
                 irc.queueMsg(ircmsgs.privmsg(channel, message))
 
-
     def _natural_join(self, lst):
-        l = len(lst);
+        l = len(lst)
         if l <= 2:
             return ' and '.join(lst)
         elif l > 2:
-            first =  ', '.join(lst[0:-1])
+            first = ', '.join(lst[0:-1])
             return "%s %s %s" % (first, 'and', lst[-1])
-
 
     def _shorten_string(self, string):
         return utils.str.ellipsisify(string, self.registryValue('maxStringLength'))
-
 
     def _format_djs(self, show):
         djs = []
@@ -164,14 +163,11 @@ class RfK(callbacks.Plugin):
             djs.append(dj['dj_name'])
         return self._natural_join(djs)
 
-
     def _format_timedelta(self, time_string):
         return humanize.time.naturaldelta(pytz.utc.localize(datetime.datetime.utcnow()) - dateutil.parser.parse(time_string))
 
-
     def _format_showtime(self, show):
         return u'%s - %s UTC' % (dateutil.parser.parse(show['show_begin']).strftime('%d.%m. %H:%M'), dateutil.parser.parse(show['show_end']).strftime('%H:%M'))
-
 
     def dj(self, irc, msg, args):
         """
@@ -195,7 +191,6 @@ class RfK(callbacks.Plugin):
 
     dj = wrap(dj)
 
-
     def kickdj(self, irc, msg, args):
         """
 
@@ -218,7 +213,6 @@ class RfK(callbacks.Plugin):
 
     kickdj = wrap(kickdj, ['admin'])
 
-
     def track(self, irc, msg, args):
         """
 
@@ -240,7 +234,6 @@ class RfK(callbacks.Plugin):
             irc.reply(reply)
 
     track = wrap(track)
-
 
     def tracklist(self, irc, msg, args, num=3):
         """[<num>]
@@ -268,7 +261,6 @@ class RfK(callbacks.Plugin):
             irc.reply(reply)
 
     tracklist = wrap(tracklist, [optional('int')])
-
 
     def listener(self, irc, msg, args):
         """
@@ -313,7 +305,6 @@ class RfK(callbacks.Plugin):
 
     listener = wrap(listener)
 
-
     def show(self, irc, msg, args):
         """
 
@@ -341,7 +332,7 @@ class RfK(callbacks.Plugin):
                     running_show = current_show['running_show']
 
                     # check if one the djs is really connected
-                    if running_show['show_connected'] == True:
+                    if running_show['show_connected'] is True:
 
                         # planned show
                         if running_show['show_end']:
@@ -371,7 +362,6 @@ class RfK(callbacks.Plugin):
 
     show = wrap(show)
 
-
     def nextshow(self, irc, msg, args, dj_name):
         """[<dj_name>]
 
@@ -398,7 +388,6 @@ class RfK(callbacks.Plugin):
             irc.reply(reply)
 
     nextshow = wrap(nextshow, [optional('somethingWithoutSpaces')])
-
 
     def lastshow(self, irc, msg, args, dj_name):
         """[<dj_name>]
