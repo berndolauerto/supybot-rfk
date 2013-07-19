@@ -142,6 +142,7 @@ class RfK(callbacks.Plugin):
 
     def _announce(self, irc, message):
         message = u'%s %s' % (self.registryValue('announcePrefix'), message)
+        message = ircutils.safeArgument(message)
         for channel in irc.state.channels:
             if self.registryValue('announce', channel):
                 irc.queueMsg(ircmsgs.privmsg(channel, message))
