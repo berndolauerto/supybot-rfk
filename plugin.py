@@ -236,14 +236,14 @@ class RfK(callbacks.Plugin):
 
     track = wrap(track)
 
-    def tracklist(self, irc, msg, args, num=3):
-        """[<num>]
+    def tracklist(self, irc, msg, args, dj_name):
+        """[dj_name]
 
-        Return the last x played tracks (default: x = 3)
+        Return the last 5 played tracks by <dj_name>
         """
 
         try:
-            last_tracks = self._query('last_tracks')['data']['last_tracks']
+            last_tracks = self._query('last_tracks', dj_name=dj_name, limit=5)['data']['last_tracks']
 
             if last_tracks:
 
@@ -261,7 +261,7 @@ class RfK(callbacks.Plugin):
         finally:
             irc.reply(reply)
 
-    tracklist = wrap(tracklist, [optional('int')])
+    tracklist = wrap(tracklist, [optional('somethingWithoutSpaces')])
 
     def listener(self, irc, msg, args):
         """
