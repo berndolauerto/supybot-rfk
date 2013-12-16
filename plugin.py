@@ -168,7 +168,9 @@ class RfK(callbacks.Plugin):
             return "%s %s %s" % (first, 'and', lst[-1])
 
     def _shorten_string(self, string):
-        return utils.str.ellipsisify(string, self.registryValue('maxStringLength'))
+        string = string.replace('\n', ' ')
+        string = utils.str.ellipsisify(string, self.registryValue('maxStringLength'))
+        return string
 
     def _format_djs(self, show):
         djs = []
