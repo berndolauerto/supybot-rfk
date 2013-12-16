@@ -82,6 +82,18 @@ class RfK(callbacks.Plugin):
 
                 self.last_track_id = current_track['track_id'] if current_track else None
 
+                # check for peak, if enabled
+                if self.registryValue('enablePeak'):
+                    result = self._query('listener')
+                    listener = result['data']['listener']
+
+                    if listener['total_count'] > self.registryValue('peakValue'):
+                        announce = u'New listener peak of %s concurrent listener! (old peak was: %s)' % (
+                            listener['total_count'], self.registryValue('peakValue'))
+                        self._announce(irc, announce)
+                        self.setRegistryValue('peakValue', listener['total_count'])
+                        self.setRegistryValue('peakTime', pytz.utc.localize(datetime.datetime.utcnow()).isoformat())
+
             except Exception, e:
                 log.error('RfK.poll_event: %s' % repr(e))
 
@@ -416,6 +428,31 @@ class RfK(callbacks.Plugin):
             irc.reply(reply)
 
     lastshow = wrap(lastshow, [optional('somethingWithoutSpaces')])
+
+    def peak(self, irc, msg, args):
+        """
+
+        Return the global listener peak of RfK
+        """
+
+        try:
+            if self.registryValue('enablePeak'):
+                peak_value = self.registryValue('peakValue')
+                peak_time = self.registryValue('peakTime')
+                peak_time_format = dateutil.parser.parse(peak_time).strftime('%d.%m.%Y %H:%M')
+                peak_time_delta = self._format_timedelta(peak_time)
+
+                reply = u'RfK listener peak: %s concurrent listener (reached on %s -- %s ago)' % (
+                    peak_value, peak_time_format, peak_time_delta)
+
+            else:
+                reply = u'Peak tracking not enabled'
+
+        except:
+            reply = self.reply_error
+
+        finally:
+            irc.reply(reply)
 
 
 Class = RfK
