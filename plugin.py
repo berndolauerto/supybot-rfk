@@ -198,7 +198,8 @@ class RfK(callbacks.Plugin):
             else:
                 reply = u'No one is streaming right now'
 
-        except:
+        except Exception, e:
+            log.error('RfK.dj: %s' % repr(e))
             reply = self.reply_error
 
         finally:
@@ -220,7 +221,8 @@ class RfK(callbacks.Plugin):
             else:
                 reply = u'Cleansing could not be completed'
 
-        except:
+        except Exception, e:
+            log.error('RfK.kickdj: %s' % repr(e))
             reply = self.reply_error
 
         finally:
@@ -242,7 +244,8 @@ class RfK(callbacks.Plugin):
             else:
                 reply = u'Nothing is on right now'
 
-        except:
+        except Exception, e:
+            log.error('RfK.track: %s' % repr(e))
             reply = self.reply_error
 
         finally:
@@ -269,7 +272,8 @@ class RfK(callbacks.Plugin):
             else:
                 reply = u'Track history is empty'
 
-        except:
+        except Exception, e:
+            log.error('RfK.tracklist: %s' % repr(e))
             reply = self.reply_error
 
         finally:
@@ -312,7 +316,8 @@ class RfK(callbacks.Plugin):
                 else:
                     reply = u'No one is listening right now'
 
-        except:
+        except Exception, e:
+            log.error('RfK.listener: %s' % repr(e))
             reply = self.reply_error
 
         finally:
@@ -369,7 +374,8 @@ class RfK(callbacks.Plugin):
             else:
                 reply = u'No one is streaming right now'
 
-        except:
+        except Exception, e:
+            log.error('RfK.show: %s' % repr(e))
             reply = self.reply_error
 
         finally:
@@ -396,7 +402,8 @@ class RfK(callbacks.Plugin):
             else:
                 reply = u'No scheduled shows' if not dj_name else u'No scheduled shows with %s' % dj_name
 
-        except:
+        except Exception, e:
+            log.error('RfK.nextshow: %s' % repr(e))
             reply = self.reply_error
 
         finally:
@@ -423,7 +430,8 @@ class RfK(callbacks.Plugin):
             else:
                 reply = u'No show took place, yet' if not dj_name else u'%s never did a show so far' % dj_name
 
-        except:
+        except Exception, e:
+            log.error('RfK.lastshow: %s' % repr(e))
             reply = self.reply_error
 
         finally:
@@ -450,11 +458,14 @@ class RfK(callbacks.Plugin):
             else:
                 reply = u'Peak tracking not enabled'
 
-        except:
+        except Exception, e:
+            log.error('RfK.peak: %s' % repr(e))
             reply = self.reply_error
 
         finally:
             irc.reply(reply)
+
+    peak = wrap(peak)
 
     def traffic(self, irc, msg, args):
         """
@@ -481,7 +492,8 @@ class RfK(callbacks.Plugin):
             else:
                 reply = u'No active relays found'
 
-        except:
+        except Exception, e:
+            log.error('RfK.traffic: %s' % repr(e))
             reply = self.reply_error
 
         finally:
