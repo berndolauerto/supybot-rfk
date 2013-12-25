@@ -310,7 +310,7 @@ class RfK(callbacks.Plugin):
                     reply_country = ' | '.join(reply_country)
                     foreigner_count = int((float(foreigner_count) / float(listener['total_count'])) * 100)
 
-                    reply = u'Listener: %d ( %s )( %s )( %d%% foreigners )' % (
+                    reply = u'%d ( %s )( %s )( %d%% foreigners )' % (
                         listener['total_count'], reply_stream, reply_country, foreigner_count)
 
                 else:
@@ -483,11 +483,11 @@ class RfK(callbacks.Plugin):
                     # type 0 -> Master
                     # type 1 -> Slave
                     if relay['relay_type'] == 0:
-                        master = 'master: %i kB/s' % (relay['relay_current_bandwidth'] / 8)
+                        master = 'master: %d kB/s' % (relay['relay_current_bandwidth'] / 8)
                     elif relay['relay_type'] == 1:
-                        slaves.append('relay #%i: %i kB/s' % (relay['relay_id'], relay['relay_current_bandwidth'] / 8))
+                        slaves.append('relay #%d: %d kB/s' % (relay['relay_id'], relay['relay_current_bandwidth'] / 8))
 
-                reply = u'%i kB/s ( %s | %s )' % (active_relays['total_bandwidth'] / 8, master, ' | '.join(slaves))
+                reply = u'%d kB/s ( %s | %s )' % (active_relays['total_bandwidth'] / 8, master, ' | '.join(slaves))
 
             else:
                 reply = u'No active relays found'
