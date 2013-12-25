@@ -456,5 +456,38 @@ class RfK(callbacks.Plugin):
         finally:
             irc.reply(reply)
 
+    def traffic(self, irc, msg, args):
+        """
+
+        Return traffic information on all active relays
+        """
+
+        try:
+            active_relays = self._query('active_relays')['data']['active_relays']
+
+            if active_relays:
+                slaves = []
+
+                for relay in active_relays['relays']:
+                    # type 0 -> Master
+                    # type 1 -> Slave
+                    if relay['relay_type'] == 0:
+                        master = 'master: %i kB/s' % (relay['relay_current_bandwidth'] / 8)
+                    elif relay['relay_type'] == 1:
+                        slaves.append('relay #%i: %i kB/s' % (relay['relay_id'], relay['relay_current_bandwidth'] / 8))
+
+                reply = u'%i kB/s (%s | %s)' % (active_relays['total_bandwidth'] / 8, master, ' | '.join(slaves))
+
+            else:
+                reply = u'No active relays found'
+
+        except:
+            reply = self.reply_error
+
+        finally:
+            irc.reply(reply)
+
+    traffic = wrap(traffic)
+
 
 Class = RfK
