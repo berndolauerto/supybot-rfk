@@ -487,7 +487,7 @@ class RfK(callbacks.Plugin):
                     elif relay['relay_type'] == 1:
                         slaves.append('relay #%i: %i kB/s' % (relay['relay_id'], relay['relay_current_bandwidth'] / 8))
 
-                reply = u'%i kB/s (%s | %s)' % (active_relays['total_bandwidth'] / 8, master, ' | '.join(slaves))
+                reply = u'%i kB/s ( %s | %s )' % (active_relays['total_bandwidth'] / 8, master, ' | '.join(slaves))
 
             else:
                 reply = u'No active relays found'
