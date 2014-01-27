@@ -31,6 +31,8 @@ conf.registerGlobalValue(RfK, 'enablePolling',
     registry.Boolean(False, """Enable polling of radio server"""))
 conf.registerGlobalValue(RfK, 'pollingInterval',
     registry.PositiveInteger(15, """Interval at which to poll the radio server"""))
+conf.registerGlobalValue(RfK, 'timezone',
+    registry.String('Europe/Berlin', """Timezone to convert UTC time to"""))
 conf.registerChannelValue(RfK, 'announce',
     registry.Boolean(False, """Announce radio status on this channel"""))
 conf.registerChannelValue(RfK, 'announcePrefix',

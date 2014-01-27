@@ -182,7 +182,8 @@ class RfK(callbacks.Plugin):
         return humanize.time.naturaldelta(pytz.utc.localize(datetime.datetime.utcnow()) - dateutil.parser.parse(time_string))
 
     def _format_showtime(self, show):
-        return u'%s - %s UTC' % (dateutil.parser.parse(show['show_begin']).strftime('%d.%m. %H:%M'), dateutil.parser.parse(show['show_end']).strftime('%H:%M'))
+        tz = pytz.timezone( self.registryValue('timezone'))
+        return u'%s - %s' % (dateutil.parser.parse(show['show_begin']).astimezone(tz).strftime('%d.%m. %H:%M'), dateutil.parser.parse(show['show_end']).astimezone(tz).strftime('%H:%M %Z'))
 
     def dj(self, irc, msg, args):
         """
@@ -449,7 +450,8 @@ class RfK(callbacks.Plugin):
             if self.registryValue('enablePeak'):
                 peak_value = self.registryValue('peakValue')
                 peak_time = self.registryValue('peakTime')
-                peak_time_format = dateutil.parser.parse(peak_time).strftime('%d.%m.%Y %H:%M')
+                peak_time_tz = pytz.timezone( self.registryValue('timezone'))
+                peak_time_format = dateutil.parser.parse(peak_time).astimezone(peak_time_tz).strftime('%d.%m.%Y %H:%M %Z')
                 peak_time_delta = self._format_timedelta(peak_time)
 
                 reply = u'RfK listener peak: %s concurrent listener (reached on %s -- %s ago)' % (
