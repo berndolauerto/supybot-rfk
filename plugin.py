@@ -140,17 +140,19 @@ class RfK(callbacks.Plugin):
             response = opener.open(request_url)
         except IOError, e:
             log.error('RfK._query: %s' % repr(e))
+            return None
         else:
             try:
                 data = json.loads(response.read())
             except ValueError, e:
                 log.error('RfK._query: %s' % repr(e))
+                return None
             else:
                 if data['status']['code'] != 0:
                     log.error('RfK._query: %s' % repr(data))
                 else:
                     log.debug('RfK._query: %s' % repr(data))
-                    return data
+                return data
 
     def _announce(self, irc, message):
         message = u'%s %s' % (self.registryValue('announcePrefix'), message)
