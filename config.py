@@ -39,12 +39,6 @@ conf.registerChannelValue(RfK, 'announcePrefix',
     registry.String('[RfK]', """Prefix for every announment made"""))
 conf.registerGlobalValue(RfK, 'maxStringLength',
     registry.PositiveInteger(140, """Allowed string length before shortener kicks in"""))
-conf.registerGlobalValue(RfK, 'enablePeak',
-    registry.Boolean(False, """Enable tracking of the peak listener count"""))
-conf.registerGlobalValue(RfK, 'peakValue',
-    registry.Integer(0, """peak listener count"""))
-conf.registerGlobalValue(RfK, 'peakTime',
-    registry.String('2009-04-21T00:00:00+00:00', """time peak was reached"""))
 
 
 # vim:set shiftwidth=4 tabstop=4 expandtab textwidth=79:

@@ -1,5 +1,5 @@
 ###
-# Copyright (c) 2013, MrLoom
+# Copyright (c) 2014, MrLoom
 # All rights reserved.
 #
 #
@@ -184,7 +184,7 @@ class RfK(callbacks.Plugin):
         return humanize.time.naturaldelta(pytz.utc.localize(datetime.datetime.utcnow()) - dateutil.parser.parse(time_string))
 
     def _format_showtime(self, show):
-        tz = pytz.timezone( self.registryValue('timezone'))
+        tz = pytz.timezone(self.registryValue('timezone'))
         return u'%s - %s' % (dateutil.parser.parse(show['show_begin']).astimezone(tz).strftime('%d.%m. %H:%M'), dateutil.parser.parse(show['show_end']).astimezone(tz).strftime('%H:%M %Z'))
 
     def dj(self, irc, msg, args):
@@ -449,18 +449,21 @@ class RfK(callbacks.Plugin):
         """
 
         try:
-            if self.registryValue('enablePeak'):
-                peak_value = self.registryValue('peakValue')
-                peak_time = self.registryValue('peakTime')
-                peak_time_tz = pytz.timezone( self.registryValue('timezone'))
+            listener_peak = self._query('listener_peak')['data']['listener_peak']
+
+            if listener_peak:
+                peak_value = listener_peak['peak_value']
+                peak_time = listener_peak['peak_time']
+                peak_time_tz = pytz.timezone(self.registryValue('timezone'))
                 peak_time_format = dateutil.parser.parse(peak_time).astimezone(peak_time_tz).strftime('%d.%m.%Y %H:%M %Z')
                 peak_time_delta = self._format_timedelta(peak_time)
 
-                reply = u'RfK listener peak: %s concurrent listener (reached on %s -- %s ago)' % (
-                    peak_value, peak_time_format, peak_time_delta)
-
-            else:
-                reply = u'Peak tracking not enabled'
+                if 'peak_show' in listener_peak:
+                    reply = u'RfK listener peak: %s concurrent listener (reached during "%s" with %s on %s -- %s ago)' % (
+                        peak_value, listener_peak['peak_show']['show_name'], self._format_djs(listener_peak['peak_show']), peak_time_format, peak_time_delta)
+                else:
+                    reply = u'RfK listener peak: %s concurrent listener (reached on %s -- %s ago)' % (
+                        peak_value, peak_time_format, peak_time_delta)
 
         except Exception, e:
             log.error('RfK.peak: %s' % repr(e))
