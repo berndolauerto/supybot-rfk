@@ -82,18 +82,6 @@ class RfK(callbacks.Plugin):
 
                 self.last_track_id = current_track['track_id'] if current_track else None
 
-                # check for peak, if enabled
-                if self.registryValue('enablePeak'):
-                    result = self._query('listener')
-                    listener = result['data']['listener']
-
-                    if listener['total_count'] > self.registryValue('peakValue'):
-                        announce = u'New listener peak of %s concurrent listener! (old peak was: %s)' % (
-                            listener['total_count'], self.registryValue('peakValue'))
-                        self._announce(irc, announce)
-                        self.setRegistryValue('peakValue', listener['total_count'])
-                        self.setRegistryValue('peakTime', pytz.utc.localize(datetime.datetime.utcnow()).isoformat())
-
             except Exception, e:
                 log.error('RfK.poll_event: %s' % repr(e))
 
